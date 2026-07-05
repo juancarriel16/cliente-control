@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/clientes/$id")({
 function FichaCliente() {
   const { id } = Route.useParams();
 
-  const { data: cliente } = useQuery({
+  const { data: cliente, isLoading: loadingCliente, error: errorCliente } = useQuery({
     queryKey: ["cliente", id],
     queryFn: async () => {
       const { data, error } = await supabase.from("clientes").select("*").eq("id", id).maybeSingle();
@@ -33,19 +33,19 @@ function FichaCliente() {
     },
   });
 
+  const reservaIds = reservas.map((r: any) => r.id);
   const { data: pagos = [] } = useQuery({
-    queryKey: ["cliente-pagos", id],
+    queryKey: ["cliente-pagos", id, reservaIds.join(",")],
     queryFn: async () => {
-      const ids = reservas.map((r: any) => r.id);
-      if (ids.length === 0) return [];
+      if (reservaIds.length === 0) return [];
       const { data, error } = await supabase
         .from("pagos")
         .select("*")
-        .in("reserva_id", ids);
+        .in("reserva_id", reservaIds);
       if (error) throw error;
       return data ?? [];
     },
-    enabled: reservas.length > 0,
+    enabled: reservaIds.length > 0,
   });
 
   const totalReservas = reservas.length;
@@ -53,8 +53,21 @@ function FichaCliente() {
   const totalAbonado = pagos.reduce((s: number, p: any) => s + Number(p.monto), 0);
   const pendiente = Math.max(0, totalComprado - totalAbonado);
 
-  if (!cliente) {
+  if (loadingCliente) {
     return <p className="text-muted-foreground">Cargando cliente…</p>;
+  }
+  if (errorCliente) {
+    return <p className="text-destructive">Error: {(errorCliente as any).message}</p>;
+  }
+  if (!cliente) {
+    return (
+      <div>
+        <Button variant="outline" asChild className="mb-6">
+          <Link to="/clientes">← Volver a clientes</Link>
+        </Button>
+        <p className="text-muted-foreground">Cliente no encontrado.</p>
+      </div>
+    );
   }
 
   return (
@@ -78,7 +91,7 @@ function FichaCliente() {
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-4 mt-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <div className="bg-secondary rounded-xl p-4 text-center">
             <p className="text-xs uppercase text-muted-foreground">Reservas</p>
             <p className="text-2xl font-bold mt-1">{totalReservas}</p>
@@ -86,6 +99,10 @@ function FichaCliente() {
           <div className="bg-secondary rounded-xl p-4 text-center">
             <p className="text-xs uppercase text-muted-foreground">Total comprado</p>
             <p className="text-2xl font-bold mt-1">{money(totalComprado)}</p>
+          </div>
+          <div className="bg-secondary rounded-xl p-4 text-center">
+            <p className="text-xs uppercase text-muted-foreground">Total abonado</p>
+            <p className="text-2xl font-bold mt-1 text-emerald-600">{money(totalAbonado)}</p>
           </div>
           <div className="bg-secondary rounded-xl p-4 text-center">
             <p className="text-xs uppercase text-muted-foreground">Pendiente</p>
