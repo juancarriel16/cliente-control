@@ -33,6 +33,17 @@ function PagosPage() {
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
 
+  const openComprobante = async (path: string) => {
+    const { data, error } = await supabase.storage
+      .from("comprobantes")
+      .createSignedUrl(path, 60);
+    if (error || !data) {
+      toast.error("No se pudo abrir el comprobante");
+      return;
+    }
+    window.open(data.signedUrl, "_blank");
+  };
+
   const { data: pagos = [] } = useQuery({
     queryKey: ["pagos"],
     queryFn: async () => {
@@ -47,6 +58,14 @@ function PagosPage() {
 
   const deleteMut = useMutation({
     mutationFn: async (id: string) => {
+      const { data: pago } = await supabase
+        .from("pagos")
+        .select("comprobante_url")
+        .eq("id", id)
+        .maybeSingle();
+      if (pago?.comprobante_url) {
+        await supabase.storage.from("comprobantes").remove([pago.comprobante_url]);
+      }
       const { error } = await supabase.from("pagos").delete().eq("id", id);
       if (error) throw error;
     },
@@ -96,6 +115,16 @@ function PagosPage() {
                 <p className="text-xs text-muted-foreground uppercase">Monto</p>
                 <p className="font-bold text-lg text-primary">{money(p.monto)}</p>
               </div>
+              {p.comprobante_url && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => openComprobante(p.comprobante_url)}
+                  title="Ver comprobante"
+                >
+                  <i className="fa-solid fa-file-invoice mr-1" /> Comprobante
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"
@@ -118,6 +147,7 @@ function PagoForm({ onDone }: { onDone: () => void }) {
   const [reservaId, setReservaId] = useState<string>("");
   const [monto, setMonto] = useState("");
   const [notas, setNotas] = useState("");
+  const [file, setFile] = useState<File | null>(null);
 
   const { data: reservas = [] } = useQuery({
     queryKey: ["reservas-select"],
@@ -138,10 +168,22 @@ function PagoForm({ onDone }: { onDone: () => void }) {
       if (!m || m <= 0) throw new Error("Monto inválido");
       const { data: userRes } = await supabase.auth.getUser();
       if (!userRes.user) throw new Error("No autenticado");
+      let comprobante_url: string | null = null;
+      if (file) {
+        if (file.size > 10 * 1024 * 1024) throw new Error("Archivo mayor a 10MB");
+        const ext = file.name.split(".").pop() ?? "bin";
+        const path = `${userRes.user.id}/${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("comprobantes")
+          .upload(path, file, { contentType: file.type });
+        if (upErr) throw upErr;
+        comprobante_url = path;
+      }
       const { error } = await supabase.from("pagos").insert({
         reserva_id: reservaId,
         monto: m,
         notas: notas.trim() || null,
+        comprobante_url,
         owner_id: userRes.user.id,
       });
       if (error) throw error;
@@ -195,6 +237,17 @@ function PagoForm({ onDone }: { onDone: () => void }) {
         <div>
           <Label>Notas</Label>
           <Textarea rows={3} value={notas} onChange={(e) => setNotas(e.target.value)} />
+        </div>
+        <div>
+          <Label>Comprobante (opcional)</Label>
+          <Input
+            type="file"
+            accept="image/*,application/pdf"
+            onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Imagen o PDF, máx 10MB.
+          </p>
         </div>
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onDone}>
