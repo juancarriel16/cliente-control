@@ -14,7 +14,209 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      articulos: {
+        Row: {
+          costo: number
+          costo_envio: number
+          created_at: string
+          id: string
+          imagen_url: string | null
+          nombre: string
+          notas: string | null
+          origen: Database["public"]["Enums"]["origen_type"] | null
+          owner_id: string
+          precio_venta: number
+          proveedor: string | null
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          costo?: number
+          costo_envio?: number
+          created_at?: string
+          id?: string
+          imagen_url?: string | null
+          nombre: string
+          notas?: string | null
+          origen?: Database["public"]["Enums"]["origen_type"] | null
+          owner_id: string
+          precio_venta?: number
+          proveedor?: string | null
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          costo?: number
+          costo_envio?: number
+          created_at?: string
+          id?: string
+          imagen_url?: string | null
+          nombre?: string
+          notas?: string | null
+          origen?: Database["public"]["Enums"]["origen_type"] | null
+          owner_id?: string
+          precio_venta?: number
+          proveedor?: string | null
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      clientes: {
+        Row: {
+          created_at: string
+          id: string
+          nombre: string
+          observaciones: string | null
+          owner_id: string
+          telefono: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nombre: string
+          observaciones?: string | null
+          owner_id: string
+          telefono?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nombre?: string
+          observaciones?: string | null
+          owner_id?: string
+          telefono?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pagos: {
+        Row: {
+          comprobante_url: string | null
+          created_at: string
+          fecha: string
+          id: string
+          monto: number
+          notas: string | null
+          owner_id: string
+          reserva_id: string
+        }
+        Insert: {
+          comprobante_url?: string | null
+          created_at?: string
+          fecha?: string
+          id?: string
+          monto: number
+          notas?: string | null
+          owner_id: string
+          reserva_id: string
+        }
+        Update: {
+          comprobante_url?: string | null
+          created_at?: string
+          fecha?: string
+          id?: string
+          monto?: number
+          notas?: string | null
+          owner_id?: string
+          reserva_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagos_reserva_id_fkey"
+            columns: ["reserva_id"]
+            isOneToOne: false
+            referencedRelation: "reservas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reservas: {
+        Row: {
+          articulo_id: string | null
+          cliente_id: string
+          created_at: string
+          estado: Database["public"]["Enums"]["reserva_estado"]
+          fecha: string
+          id: string
+          imagen_url: string | null
+          notas: string | null
+          origen: Database["public"]["Enums"]["origen_type"]
+          owner_id: string
+          precio: number
+          producto: string
+          updated_at: string
+        }
+        Insert: {
+          articulo_id?: string | null
+          cliente_id: string
+          created_at?: string
+          estado?: Database["public"]["Enums"]["reserva_estado"]
+          fecha?: string
+          id?: string
+          imagen_url?: string | null
+          notas?: string | null
+          origen?: Database["public"]["Enums"]["origen_type"]
+          owner_id: string
+          precio?: number
+          producto: string
+          updated_at?: string
+        }
+        Update: {
+          articulo_id?: string | null
+          cliente_id?: string
+          created_at?: string
+          estado?: Database["public"]["Enums"]["reserva_estado"]
+          fecha?: string
+          id?: string
+          imagen_url?: string | null
+          notas?: string | null
+          origen?: Database["public"]["Enums"]["origen_type"]
+          owner_id?: string
+          precio?: number
+          producto?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservas_articulo_id_fkey"
+            columns: ["articulo_id"]
+            isOneToOne: false
+            referencedRelation: "articulos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +225,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      origen_type: "Japon" | "USA" | "China" | "Local"
+      reserva_estado:
+        | "pendiente"
+        | "en_transito"
+        | "recibido"
+        | "entregado"
+        | "cancelado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +358,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      origen_type: ["Japon", "USA", "China", "Local"],
+      reserva_estado: [
+        "pendiente",
+        "en_transito",
+        "recibido",
+        "entregado",
+        "cancelado",
+      ],
+    },
   },
 } as const
