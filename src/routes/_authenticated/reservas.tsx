@@ -206,11 +206,13 @@ function ReservaForm({
 }) {
   const qc = useQueryClient();
   const [clienteId, setClienteId] = useState<string>(editing?.cliente_id ?? preCliente ?? "");
+  const [articuloId, setArticuloId] = useState<string>(editing?.articulo_id ?? "");
   const [producto, setProducto] = useState(editing?.producto ?? "");
   const [origen, setOrigen] = useState(editing?.origen ?? "Local");
   const [estado, setEstado] = useState(editing?.estado ?? "pendiente");
   const [precio, setPrecio] = useState<string>(editing?.precio?.toString() ?? "");
   const [notas, setNotas] = useState(editing?.notas ?? "");
+  const [openArt, setOpenArt] = useState(false);
 
   const { data: clientes = [] } = useQuery({
     queryKey: ["clientes-simple"],
@@ -221,12 +223,26 @@ function ReservaForm({
     },
   });
 
+  const { data: articulos = [] } = useQuery({
+    queryKey: ["articulos-simple"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articulos")
+        .select("id, nombre, precio_venta, origen, stock, imagen_url")
+        .order("nombre");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const saveMut = useMutation({
     mutationFn: async () => {
       if (!clienteId) throw new Error("Selecciona un cliente");
-      if (!producto.trim()) throw new Error("Ingresa el nombre del producto");
+      if (!articuloId) throw new Error("Selecciona un artículo");
+      if (!producto.trim()) throw new Error("Selecciona un artículo válido");
       const payload: any = {
         cliente_id: clienteId,
+        articulo_id: articuloId,
         producto: producto.trim(),
         origen,
         estado,
@@ -252,6 +268,8 @@ function ReservaForm({
     },
     onError: (e: any) => toast.error(e.message ?? "Error al guardar"),
   });
+
+  const articuloSel = articulos.find((a: any) => a.id === articuloId);
 
   return (
     <DialogContent className="max-w-lg">
@@ -282,7 +300,62 @@ function ReservaForm({
         </div>
         <div>
           <Label>Producto / Figura</Label>
-          <Input value={producto} onChange={(e) => setProducto(e.target.value)} required />
+          <Popover open={openArt} onOpenChange={setOpenArt}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                role="combobox"
+                className={cn(
+                  "w-full justify-between font-normal",
+                  !articuloSel && "text-muted-foreground",
+                )}
+              >
+                {articuloSel ? articuloSel.nombre : "Selecciona un artículo..."}
+                <i className="fa-solid fa-chevron-down ml-2 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+              <Command>
+                <CommandInput placeholder="Buscar artículo..." />
+                <CommandList>
+                  <CommandEmpty>Sin resultados.</CommandEmpty>
+                  <CommandGroup>
+                    {articulos.map((a: any) => (
+                      <CommandItem
+                        key={a.id}
+                        value={a.nombre}
+                        onSelect={() => {
+                          setArticuloId(a.id);
+                          setProducto(a.nombre);
+                          if (a.origen) setOrigen(a.origen);
+                          if (!editing && (!precio || precio === "0")) {
+                            setPrecio(a.precio_venta?.toString() ?? "");
+                          }
+                          setOpenArt(false);
+                        }}
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium">{a.nombre}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {money(a.precio_venta)} · Stock: {a.stock} · {a.origen ?? "—"}
+                          </span>
+                        </div>
+                        {articuloId === a.id && (
+                          <i className="fa-solid fa-check ml-auto text-primary" />
+                        )}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          {articulos.length === 0 && (
+            <p className="text-xs text-muted-foreground mt-1">
+              No hay artículos. Registra uno en la sección Artículos.
+            </p>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
