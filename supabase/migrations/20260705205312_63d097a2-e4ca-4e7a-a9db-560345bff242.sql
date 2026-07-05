@@ -1,0 +1,4 @@
+CREATE POLICY "Owner manages comprobantes select" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'comprobantes' AND owner = auth.uid());
+CREATE POLICY "Owner manages comprobantes insert" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'comprobantes' AND owner = auth.uid());
+CREATE POLICY "Owner manages comprobantes update" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'comprobantes' AND owner = auth.uid());
+CREATE POLICY "Owner manages comprobantes delete" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'comprobantes' AND owner = auth.uid());
