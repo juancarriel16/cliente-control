@@ -8,13 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -22,6 +15,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { money, shortDate } from "@/lib/format";
 
@@ -145,6 +148,7 @@ function PagosPage() {
 function PagoForm({ onDone }: { onDone: () => void }) {
   const qc = useQueryClient();
   const [reservaId, setReservaId] = useState<string>("");
+  const [openRes, setOpenRes] = useState(false);
   const [monto, setMonto] = useState("");
   const [notas, setNotas] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -154,12 +158,14 @@ function PagoForm({ onDone }: { onDone: () => void }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reservas")
-        .select("id, producto, precio, clientes(nombre)")
+        .select("id, producto, precio, origen, clientes(nombre)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  const reservaSel = reservas.find((r: any) => r.id === reservaId);
 
   const saveMut = useMutation({
     mutationFn: async () => {
@@ -210,18 +216,61 @@ function PagoForm({ onDone }: { onDone: () => void }) {
       >
         <div>
           <Label>Reserva</Label>
-          <Select value={reservaId} onValueChange={setReservaId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona una reserva" />
-            </SelectTrigger>
-            <SelectContent>
-              {reservas.map((r: any) => (
-                <SelectItem key={r.id} value={r.id}>
-                  {r.clientes?.nombre} — {r.producto} ({money(r.precio)})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={openRes} onOpenChange={setOpenRes}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                role="combobox"
+                className={cn(
+                  "w-full justify-between font-normal",
+                  !reservaSel && "text-muted-foreground",
+                )}
+              >
+                {reservaSel
+                  ? `${reservaSel.clientes?.nombre} — ${reservaSel.producto} (${money(reservaSel.precio)})`
+                  : "Selecciona una reserva..."}
+                <i className="fa-solid fa-chevron-down ml-2 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+              <Command>
+                <CommandInput placeholder="Buscar reserva..." />
+                <CommandList>
+                  <CommandEmpty>Sin resultados.</CommandEmpty>
+                  <CommandGroup>
+                    {reservas.map((r: any) => (
+                      <CommandItem
+                        key={r.id}
+                        value={`${r.clientes?.nombre ?? ""} ${r.producto ?? ""} ${r.origen ?? ""}`}
+                        onSelect={() => {
+                          setReservaId(r.id);
+                          setOpenRes(false);
+                        }}
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium">
+                            {r.clientes?.nombre} — {r.producto}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {money(r.precio)} · {r.origen ?? "—"}
+                          </span>
+                        </div>
+                        {reservaId === r.id && (
+                          <i className="fa-solid fa-check ml-auto text-primary" />
+                        )}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          {reservas.length === 0 && (
+            <p className="text-xs text-muted-foreground mt-1">
+              No hay reservas. Registra una en la sección Reservas.
+            </p>
+          )}
         </div>
         <div>
           <Label>Monto (S/.)</Label>
