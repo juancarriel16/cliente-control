@@ -1,0 +1,18 @@
+[build]
+  command = "NITRO_PRESET=netlify bun run build"
+  publish = "dist/client"
+
+[build.environment]
+  NITRO_PRESET = "netlify"
+  NODE_VERSION = "20"
+
+# Nitro (TanStack Start) emite las funciones SSR aquí cuando usa el preset netlify
+[functions]
+  directory = ".netlify/functions-internal"
+
+# Fallback SPA/SSR: cualquier ruta no encontrada la maneja el server de Nitro
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/server"
+  status = 200
+  force = false
