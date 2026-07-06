@@ -216,18 +216,61 @@ function PagoForm({ onDone }: { onDone: () => void }) {
       >
         <div>
           <Label>Reserva</Label>
-          <Select value={reservaId} onValueChange={setReservaId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona una reserva" />
-            </SelectTrigger>
-            <SelectContent>
-              {reservas.map((r: any) => (
-                <SelectItem key={r.id} value={r.id}>
-                  {r.clientes?.nombre} — {r.producto} ({money(r.precio)})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Popover open={openRes} onOpenChange={setOpenRes}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                role="combobox"
+                className={cn(
+                  "w-full justify-between font-normal",
+                  !reservaSel && "text-muted-foreground",
+                )}
+              >
+                {reservaSel
+                  ? `${reservaSel.clientes?.nombre} — ${reservaSel.producto} (${money(reservaSel.precio)})`
+                  : "Selecciona una reserva..."}
+                <i className="fa-solid fa-chevron-down ml-2 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+              <Command>
+                <CommandInput placeholder="Buscar reserva..." />
+                <CommandList>
+                  <CommandEmpty>Sin resultados.</CommandEmpty>
+                  <CommandGroup>
+                    {reservas.map((r: any) => (
+                      <CommandItem
+                        key={r.id}
+                        value={`${r.clientes?.nombre ?? ""} ${r.producto ?? ""} ${r.origen ?? ""}`}
+                        onSelect={() => {
+                          setReservaId(r.id);
+                          setOpenRes(false);
+                        }}
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium">
+                            {r.clientes?.nombre} — {r.producto}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {money(r.precio)} · {r.origen ?? "—"}
+                          </span>
+                        </div>
+                        {reservaId === r.id && (
+                          <i className="fa-solid fa-check ml-auto text-primary" />
+                        )}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          {reservas.length === 0 && (
+            <p className="text-xs text-muted-foreground mt-1">
+              No hay reservas. Registra una en la sección Reservas.
+            </p>
+          )}
         </div>
         <div>
           <Label>Monto (S/.)</Label>
