@@ -148,6 +148,7 @@ function PagosPage() {
 function PagoForm({ onDone }: { onDone: () => void }) {
   const qc = useQueryClient();
   const [reservaId, setReservaId] = useState<string>("");
+  const [openRes, setOpenRes] = useState(false);
   const [monto, setMonto] = useState("");
   const [notas, setNotas] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -157,12 +158,14 @@ function PagoForm({ onDone }: { onDone: () => void }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reservas")
-        .select("id, producto, precio, clientes(nombre)")
+        .select("id, producto, precio, origen, clientes(nombre)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
     },
   });
+
+  const reservaSel = reservas.find((r: any) => r.id === reservaId);
 
   const saveMut = useMutation({
     mutationFn: async () => {
