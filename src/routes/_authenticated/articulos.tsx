@@ -71,7 +71,7 @@ function ArticulosPage() {
             }}
           >
             <DialogTrigger asChild>
-              <Button size="lg" onClick={() => setEditing(null)}>
+              <Button onClick={() => setEditing(null)}>
                 <i className="fa-solid fa-plus mr-2" /> Nuevo Artículo
               </Button>
             </DialogTrigger>

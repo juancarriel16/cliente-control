@@ -86,7 +86,7 @@ function PagosPage() {
         action={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button size="lg">
+              <Button>
                 <i className="fa-solid fa-plus mr-2" /> Registrar Pago
               </Button>
             </DialogTrigger>
@@ -104,39 +104,44 @@ function PagosPage() {
           {pagos.map((p: any) => (
             <div
               key={p.id}
-              className="bg-card border border-border rounded-xl p-5 flex items-center gap-5 flex-wrap"
+              className="bg-card border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5"
             >
-              <div className="flex-1 min-w-[220px]">
-                <h3 className="font-semibold">{p.reservas?.producto ?? "Reserva eliminada"}</h3>
-                <p className="text-sm text-muted-foreground">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold truncate">{p.reservas?.producto ?? "Reserva eliminada"}</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground break-words">
                   <i className="fa-solid fa-user mr-1" /> {p.reservas?.clientes?.nombre ?? "—"} ·{" "}
                   {shortDate(p.fecha)}
                 </p>
                 {p.notas && <p className="text-xs text-muted-foreground mt-1">{p.notas}</p>}
               </div>
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground uppercase">Monto</p>
-                <p className="font-bold text-lg text-primary">{money(p.monto)}</p>
+              <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-5">
+                <div className="text-right">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground uppercase">Monto</p>
+                  <p className="font-bold text-base sm:text-lg text-primary">{money(p.monto)}</p>
+                </div>
+                <div className="flex gap-2">
+                  {p.comprobante_url && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openComprobante(p.comprobante_url)}
+                      title="Ver comprobante"
+                    >
+                      <i className="fa-solid fa-file-invoice sm:mr-1" />
+                      <span className="hidden sm:inline">Comprobante</span>
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm("¿Eliminar pago?")) deleteMut.mutate(p.id);
+                    }}
+                  >
+                    <i className="fa-solid fa-trash text-destructive" />
+                  </Button>
+                </div>
               </div>
-              {p.comprobante_url && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openComprobante(p.comprobante_url)}
-                  title="Ver comprobante"
-                >
-                  <i className="fa-solid fa-file-invoice mr-1" /> Comprobante
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  if (confirm("¿Eliminar pago?")) deleteMut.mutate(p.id);
-                }}
-              >
-                <i className="fa-solid fa-trash text-destructive" />
-              </Button>
             </div>
           ))}
         </div>

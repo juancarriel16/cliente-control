@@ -76,8 +76,8 @@ function FichaCliente() {
         <Link to="/clientes">← Volver a clientes</Link>
       </Button>
 
-      <div className="bg-card border border-border rounded-2xl p-8 mb-6">
-        <h1 className="text-3xl font-bold">{cliente.nombre}</h1>
+      <div className="bg-card border border-border rounded-2xl p-5 sm:p-8 mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold break-words">{cliente.nombre}</h1>
         <p className="text-muted-foreground mt-1">
           <i className="fa-solid fa-phone mr-2" />
           {cliente.telefono || "Sin teléfono"}
@@ -91,29 +91,29 @@ function FichaCliente() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          <div className="bg-secondary rounded-xl p-4 text-center">
-            <p className="text-xs uppercase text-muted-foreground">Reservas</p>
-            <p className="text-2xl font-bold mt-1">{totalReservas}</p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6">
+          <div className="bg-secondary rounded-xl p-3 sm:p-4 text-center">
+            <p className="text-[10px] sm:text-xs uppercase text-muted-foreground">Reservas</p>
+            <p className="text-xl sm:text-2xl font-bold mt-1">{totalReservas}</p>
           </div>
-          <div className="bg-secondary rounded-xl p-4 text-center">
-            <p className="text-xs uppercase text-muted-foreground">Total comprado</p>
-            <p className="text-2xl font-bold mt-1">{money(totalComprado)}</p>
+          <div className="bg-secondary rounded-xl p-3 sm:p-4 text-center">
+            <p className="text-[10px] sm:text-xs uppercase text-muted-foreground">Total comprado</p>
+            <p className="text-xl sm:text-2xl font-bold mt-1">{money(totalComprado)}</p>
           </div>
-          <div className="bg-secondary rounded-xl p-4 text-center">
-            <p className="text-xs uppercase text-muted-foreground">Total abonado</p>
-            <p className="text-2xl font-bold mt-1 text-emerald-600">{money(totalAbonado)}</p>
+          <div className="bg-secondary rounded-xl p-3 sm:p-4 text-center">
+            <p className="text-[10px] sm:text-xs uppercase text-muted-foreground">Total abonado</p>
+            <p className="text-xl sm:text-2xl font-bold mt-1 text-emerald-600">{money(totalAbonado)}</p>
           </div>
-          <div className="bg-secondary rounded-xl p-4 text-center">
-            <p className="text-xs uppercase text-muted-foreground">Pendiente</p>
-            <p className="text-2xl font-bold mt-1 text-primary">{money(pendiente)}</p>
+          <div className="bg-secondary rounded-xl p-3 sm:p-4 text-center">
+            <p className="text-[10px] sm:text-xs uppercase text-muted-foreground">Pendiente</p>
+            <p className="text-xl sm:text-2xl font-bold mt-1 text-primary">{money(pendiente)}</p>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">Reservas</h2>
-        <Button asChild>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <h2 className="text-xl sm:text-2xl font-bold">Reservas</h2>
+        <Button asChild className="w-full sm:w-auto">
           <Link to="/reservas" search={{ cliente: id }}>
             <i className="fa-solid fa-plus mr-2" /> Nueva Reserva
           </Link>

@@ -83,21 +83,21 @@ function ReportesPage() {
     <div>
       <PageHeader title="Reportes" subtitle="Resumen de tu negocio." />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <Stat label="Ventas totales" value={money(totalVentas)} />
         <Stat label="Cobrado" value={money(totalCobrado)} />
         <Stat label="Pendiente" value={money(totalPendiente)} highlight />
         <Stat label="Reservas activas" value={activas.toString()} />
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-6 mb-6">
-        <h3 className="font-bold text-lg mb-4">Ingresos por mes</h3>
-        <div className="h-64">
+      <div className="bg-card border border-border rounded-xl p-4 sm:p-6 mb-6">
+        <h3 className="font-bold text-base sm:text-lg mb-4">Ingresos por mes</h3>
+        <div className="h-56 sm:h-64 -mx-2 sm:mx-0">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyData}>
+            <BarChart data={monthlyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-              <XAxis dataKey="mes" />
-              <YAxis />
+              <XAxis dataKey="mes" tick={{ fontSize: 11 }} />
+              <YAxis tick={{ fontSize: 11 }} width={45} />
               <Tooltip formatter={(v: any) => money(Number(v))} />
               <Bar dataKey="ingresos" fill="var(--color-primary)" radius={[8, 8, 0, 0]} />
             </BarChart>
@@ -106,34 +106,34 @@ function ReportesPage() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-card border border-border rounded-xl p-6">
-          <h3 className="font-bold text-lg mb-4">Top clientes</h3>
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
+          <h3 className="font-bold text-base sm:text-lg mb-4">Top clientes</h3>
           {topClientes.length === 0 ? (
             <p className="text-sm text-muted-foreground">Sin datos aún.</p>
           ) : (
             <ul className="space-y-2">
               {topClientes.map((c) => (
-                <li key={c.nombre} className="flex justify-between text-sm">
-                  <span>{c.nombre}</span>
-                  <span className="font-semibold">{money(c.total)}</span>
+                <li key={c.nombre} className="flex justify-between gap-3 text-sm">
+                  <span className="truncate">{c.nombre}</span>
+                  <span className="font-semibold shrink-0">{money(c.total)}</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
-        <div className="bg-card border border-border rounded-xl p-6">
-          <h3 className="font-bold text-lg mb-4">Productos más reservados</h3>
+        <div className="bg-card border border-border rounded-xl p-4 sm:p-6">
+          <h3 className="font-bold text-base sm:text-lg mb-4">Productos más reservados</h3>
           {topProductos.length === 0 ? (
             <p className="text-sm text-muted-foreground">Sin datos aún.</p>
           ) : (
             <ul className="space-y-2">
               {topProductos.map((p) => (
-                <li key={p.producto} className="flex justify-between text-sm">
-                  <span>
+                <li key={p.producto} className="flex justify-between gap-3 text-sm">
+                  <span className="truncate">
                     {p.producto}{" "}
                     <span className="text-muted-foreground">× {p.cantidad}</span>
                   </span>
-                  <span className="font-semibold">{money(p.monto)}</span>
+                  <span className="font-semibold shrink-0">{money(p.monto)}</span>
                 </li>
               ))}
             </ul>
@@ -146,9 +146,9 @@ function ReportesPage() {
 
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="bg-card border border-border rounded-xl p-5">
-      <p className="text-xs text-muted-foreground uppercase tracking-wide">{label}</p>
-      <p className={"text-2xl font-bold mt-2 " + (highlight ? "text-primary" : "")}>{value}</p>
+    <div className="bg-card border border-border rounded-xl p-4 sm:p-5">
+      <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">{label}</p>
+      <p className={"text-lg sm:text-2xl font-bold mt-1 sm:mt-2 break-words " + (highlight ? "text-primary" : "")}>{value}</p>
     </div>
   );
 }
