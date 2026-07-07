@@ -118,7 +118,7 @@ function ClientesPage() {
             }}
           >
             <DialogTrigger asChild>
-              <Button size="lg" onClick={() => setEditing(null)}>
+              <Button onClick={() => setEditing(null)}>
                 <i className="fa-solid fa-plus mr-2" /> Nuevo Cliente
               </Button>
             </DialogTrigger>
@@ -158,25 +158,27 @@ function ClientesPage() {
             return (
               <div
                 key={c.id}
-                className="bg-card border border-border rounded-xl p-5 flex items-center gap-5 flex-wrap"
+                className="bg-card border border-border rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5"
               >
-                <div className="flex-1 min-w-[200px]">
-                  <h3 className="font-semibold text-lg">{c.nombre}</h3>
-                  <p className="text-sm text-muted-foreground">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-base sm:text-lg truncate">{c.nombre}</h3>
+                  <p className="text-sm text-muted-foreground truncate">
                     <i className="fa-solid fa-phone mr-2" />
                     {c.telefono || "Sin teléfono"}
                   </p>
                 </div>
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Activas</p>
-                  <p className="font-bold text-lg">{s.activas}</p>
+                <div className="flex gap-6 sm:gap-5">
+                  <div className="text-center">
+                    <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">Activas</p>
+                    <p className="font-bold text-base sm:text-lg">{s.activas}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wide">Pendiente</p>
+                    <p className="font-bold text-base sm:text-lg text-primary">{money(s.pendiente)}</p>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Pendiente</p>
-                  <p className="font-bold text-lg text-primary">{money(s.pendiente)}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="secondary" size="sm" asChild>
+                <div className="flex gap-2 sm:shrink-0">
+                  <Button variant="secondary" size="sm" asChild className="flex-1 sm:flex-none">
                     <Link to="/clientes/$id" params={{ id: c.id }}>
                       Ver ficha
                     </Link>

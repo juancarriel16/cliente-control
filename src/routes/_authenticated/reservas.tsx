@@ -105,7 +105,7 @@ function ReservasPage() {
             }}
           >
             <DialogTrigger asChild>
-              <Button size="lg" onClick={() => setEditing(null)}>
+              <Button onClick={() => setEditing(null)}>
                 <i className="fa-solid fa-plus mr-2" /> Nueva Reserva
               </Button>
             </DialogTrigger>
@@ -131,26 +131,26 @@ function ReservasPage() {
             const abonado = abonadoPor(r.id);
             const restante = Math.max(0, Number(r.precio) - abonado);
             return (
-              <div key={r.id} className="bg-card border border-border rounded-xl p-5">
-                <div className="flex justify-between items-start gap-4 flex-wrap">
-                  <div className="flex-1 min-w-[200px]">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <h3 className="font-semibold text-lg">{r.producto}</h3>
+              <div key={r.id} className="bg-card border border-border rounded-xl p-4 sm:p-5">
+                <div className="flex justify-between items-start gap-3 flex-wrap">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-semibold text-base sm:text-lg">{r.producto}</h3>
                       <span
                         className={
-                          "text-xs font-semibold px-3 py-1 rounded-full " +
+                          "text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 sm:py-1 rounded-full " +
                           estadoBadgeClass(r.estado)
                         }
                       >
                         {estadoLabel(r.estado)}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-xs sm:text-sm text-muted-foreground mt-1 break-words">
                       <i className="fa-solid fa-user mr-1" /> {r.clientes?.nombre ?? "—"} ·{" "}
                       {r.origen} · {shortDate(r.fecha)}
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 shrink-0">
                     <Button
                       variant="outline"
                       size="sm"
@@ -172,18 +172,18 @@ function ReservasPage() {
                     </Button>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-3 mt-4 text-sm">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-4 text-sm">
                   <div>
-                    <p className="text-xs text-muted-foreground">Precio</p>
-                    <p className="font-semibold">{money(r.precio)}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">Precio</p>
+                    <p className="font-semibold text-sm sm:text-base">{money(r.precio)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Abonado</p>
-                    <p className="font-semibold">{money(abonado)}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">Abonado</p>
+                    <p className="font-semibold text-sm sm:text-base">{money(abonado)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Restante</p>
-                    <p className="font-semibold text-primary">{money(restante)}</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">Restante</p>
+                    <p className="font-semibold text-sm sm:text-base text-primary">{money(restante)}</p>
                   </div>
                 </div>
               </div>
