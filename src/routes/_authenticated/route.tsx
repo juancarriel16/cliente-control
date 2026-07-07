@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { IkigaiSidebar } from "@/components/ikigai-sidebar";
+import { IkigaiSidebar, IkigaiMobileBar } from "@/components/ikigai-sidebar";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -16,9 +16,12 @@ function AuthedLayout() {
   return (
     <div className="flex min-h-screen w-full bg-background">
       <IkigaiSidebar />
-      <main className="flex-1 p-10 overflow-x-auto">
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col min-w-0">
+        <IkigaiMobileBar />
+        <main className="flex-1 p-4 sm:p-6 md:p-10 overflow-x-hidden">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
