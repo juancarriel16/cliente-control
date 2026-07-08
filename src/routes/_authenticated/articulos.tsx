@@ -71,8 +71,8 @@ function ArticulosPage() {
             }}
           >
             <DialogTrigger asChild>
-              <Button onClick={() => setEditing(null)}>
-                <i className="fa-solid fa-plus mr-2" /> Nuevo Artículo
+              <Button onClick={() => setEditing(null)} size="sm">
+                <i className="fa-solid fa-plus text-xs mr-2" /> Nuevo Artículo
               </Button>
             </DialogTrigger>
             <ArticuloForm
@@ -98,11 +98,13 @@ function ArticulosPage() {
             return (
               <div key={a.id} className="bg-card border border-border rounded-xl p-5">
                 {a.imagen_url && (
-                  <img
-                    src={a.imagen_url}
-                    alt={a.nombre}
-                    className="w-full h-40 object-cover rounded-lg mb-3"
-                  />
+                  <div className="w-full h-40 rounded-lg mb-3 bg-muted/40 flex items-center justify-center overflow-hidden">
+                    <img
+                      src={a.imagen_url}
+                      alt={a.nombre}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
                 )}
                 <h3 className="font-semibold text-lg">{a.nombre}</h3>
                 <p className="text-sm text-muted-foreground">
@@ -138,7 +140,7 @@ function ArticulosPage() {
                       setOpen(true);
                     }}
                   >
-                    <i className="fa-solid fa-pen mr-2" /> Editar
+                    <i className="fa-solid fa-pen text-xs mr-2" /> Editar
                   </Button>
                   <Button
                     variant="outline"
@@ -147,7 +149,7 @@ function ArticulosPage() {
                       if (confirm("¿Eliminar artículo?")) deleteMut.mutate(a.id);
                     }}
                   >
-                    <i className="fa-solid fa-trash text-destructive" />
+                    <i className="fa-solid fa-trash text-xs text-destructive" />
                   </Button>
                 </div>
               </div>
