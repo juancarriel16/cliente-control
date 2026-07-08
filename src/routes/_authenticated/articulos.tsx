@@ -140,7 +140,7 @@ function ArticulosPage() {
                       setOpen(true);
                     }}
                   >
-                    <i className="fa-solid fa-pen mr-2" /> Editar
+                    <i className="fa-solid fa-pen text-xs mr-2" /> Editar
                   </Button>
                   <Button
                     variant="outline"
@@ -149,7 +149,7 @@ function ArticulosPage() {
                       if (confirm("¿Eliminar artículo?")) deleteMut.mutate(a.id);
                     }}
                   >
-                    <i className="fa-solid fa-trash text-destructive" />
+                    <i className="fa-solid fa-trash text-xs text-destructive" />
                   </Button>
                 </div>
               </div>
