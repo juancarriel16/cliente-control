@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { money, shortDate, estadoLabel, estadoBadgeClass } from "@/lib/format";
 
-export const Route = createFileRoute("/_authenticated/clientes/$id")({
+export const Route = createFileRoute("/_authenticated/clientes_/$id")({
   component: FichaCliente,
 });
 
