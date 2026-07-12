@@ -163,6 +163,7 @@ function ArticulosPage() {
 
 function ArticuloForm({ editing, onDone }: { editing: any | null; onDone: () => void }) {
   const qc = useQueryClient();
+  const [uploading, setUploading] = useState(false);
   const [f, setF] = useState({
     nombre: editing?.nombre ?? "",
     imagen_url: editing?.imagen_url ?? "",
@@ -211,6 +212,30 @@ function ArticuloForm({ editing, onDone }: { editing: any | null; onDone: () => 
 
   const upd = (k: string, v: string) => setF((prev) => ({ ...prev, [k]: v }));
 
+  const handleFileUpload = async (file: File) => {
+    try {
+      setUploading(true);
+      const { data: userRes } = await supabase.auth.getUser();
+      if (!userRes.user) throw new Error("No autenticado");
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${userRes.user.id}/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("articulos")
+        .upload(path, file, { cacheControl: "3600", upsert: false });
+      if (upErr) throw upErr;
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("articulos")
+        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (signErr) throw signErr;
+      upd("imagen_url", signed.signedUrl);
+      toast.success("Imagen subida");
+    } catch (e: any) {
+      toast.error(e.message ?? "Error subiendo imagen");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <DialogContent className="max-w-lg">
       <DialogHeader>
@@ -228,8 +253,29 @@ function ArticuloForm({ editing, onDone }: { editing: any | null; onDone: () => 
           <Input value={f.nombre} onChange={(e) => upd("nombre", e.target.value)} required />
         </div>
         <div>
-          <Label>URL de imagen (opcional)</Label>
-          <Input value={f.imagen_url} onChange={(e) => upd("imagen_url", e.target.value)} />
+          <Label>Imagen (opcional)</Label>
+          <div className="flex flex-col gap-2">
+            <Input
+              type="file"
+              accept="image/*"
+              disabled={uploading}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file);
+              }}
+            />
+            <Input
+              placeholder="o pega una URL"
+              value={f.imagen_url}
+              onChange={(e) => upd("imagen_url", e.target.value)}
+            />
+            {f.imagen_url && (
+              <div className="w-full h-32 rounded-lg bg-muted/40 flex items-center justify-center overflow-hidden">
+                <img src={f.imagen_url} alt="preview" className="w-full h-full object-contain" />
+              </div>
+            )}
+            {uploading && <p className="text-xs text-muted-foreground">Subiendo imagen...</p>}
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
